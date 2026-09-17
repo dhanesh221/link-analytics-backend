@@ -34,6 +34,10 @@ class LinkApiTests(TestCase):
         response = self.client.get(f"/r/{link.short_code}/")
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Click.objects.filter(link=link).count(), 1)
+    def test_unknown_short_code_returns_404(self):
+        self.client.force_authenticate(None)
+        self.assertEqual(self.client.get("/r/UNKNOWN99/").status_code, 404)
+
     @patch("links.models.Click.objects.create", side_effect=RuntimeError("database unavailable"))
     def test_tracking_failure_does_not_break_redirect(self, _):
         link = Link.objects.create(owner=self.user, original_url="https://example.com")
