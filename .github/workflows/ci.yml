@@ -1,0 +1,28 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env: { POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres, POSTGRES_DB: link_analytics }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DEBUG: 'false'
+      SECRET_KEY: ci-only-secret
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/link_analytics
+      ALLOWED_HOSTS: testserver,localhost
+      SECURE_SSL_REDIRECT: 'false'
+      SUPABASE_URL: https://example.supabase.co
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13', cache: pip }
+      - run: pip install -r requirements.txt
+      - run: python manage.py makemigrations --check --dry-run
+      - run: python manage.py migrate
+      - run: python manage.py test
+      - run: python manage.py check --deploy
