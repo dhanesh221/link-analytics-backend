@@ -17,6 +17,11 @@ class LinkApiTests(TestCase):
         response = self.client.get("/api/v1/links/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["count"], 1)
+    def test_create_returns_zero_click_count(self):
+        response = self.client.post("/api/v1/links/", {"original_url": "https://example.com/new"})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["click_count"], 0)
+
     def test_create_rejects_non_http_url(self):
         response = self.client.post("/api/v1/links/", {"original_url": "ftp://example.com"})
         self.assertEqual(response.status_code, 400)
