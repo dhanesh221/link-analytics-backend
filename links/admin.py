@@ -9,5 +9,5 @@ class LinkAdmin(admin.ModelAdmin):
 
 @admin.register(Click)
 class ClickAdmin(admin.ModelAdmin):
-    list_display = ['link', 'clicked_at', 'ip_address', 'user_agent']
+    list_display = ['link', 'clicked_at', 'user_agent']
     list_filter = ['link']
